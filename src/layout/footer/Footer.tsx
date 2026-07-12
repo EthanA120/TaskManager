@@ -29,7 +29,6 @@ function Footer() {
             label="Home"
             icon={<Home />}
             onClick={() => {
-              console.log("Home clicked");
               navigate(ROUTES.HOME);
             }}
           />
@@ -37,7 +36,6 @@ function Footer() {
             label="About"
             icon={<Info />}
             onClick={() => {
-              console.log("about clicked");
               navigate(ROUTES.ABOUT);
             }}
           />
@@ -45,7 +43,6 @@ function Footer() {
             label="Contact"
             icon={<Email />}
             onClick={() => {
-              console.log("contact clicked");
               navigate(ROUTES.CONTACT);
             }}
           />

@@ -12,6 +12,7 @@ const lightPalette = {
   mode: "light" as const,
   primary: {
     main: "#1976d2", // Indigo 600
+    glow: "#3896f4", // Indigo 400
   },
   secondary: {
     main: "#4c97d3", // Teal 500
@@ -29,7 +30,8 @@ const lightPalette = {
 const darkPalette = {
   mode: "dark" as const,
   primary: {
-    main: "#6b549e", // Indigo 400
+    main: "#7a5db7", // Indigo 400
+    glow: "#b99ff2", // Indigo 400
   },
   secondary: {
     main: "#ce93d8", // Teal 400
