@@ -1,10 +1,18 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Container,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
 import Joi from "joi";
 import { useUser } from "../providers/UserProvider";
 import ROUTES from "../router/routes";
 import { Navigate } from "react-router-dom";
+import { Login as LoginIcon, Send as SendIcon } from "@mui/icons-material";
 
 // 1. הגדרת סכימת הולידציה
 const loginSchema = Joi.object({
@@ -43,38 +51,73 @@ function LoginPage() {
     return <Navigate to={ROUTES.HOME} replace />;
   }
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          maxWidth: 300,
-          mt: 4,
-        }}
-      >
-        {/* שדה אימייל */}
-        <TextField
-          {...register("email")}
-          placeholder="Email"
-          error={!!errors.email} // צובע באדום אם יש שגיאה
-          helperText={errors.email?.message as string} // מציג את הודעת השגיאה
-        />
+    <Container maxWidth="xs" dir="rtl">
+      <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Paper elevation={3} sx={{ p: 4, width: "100%", borderRadius: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 3,
+              justifyContent: "center",
+            }}
+          >
+            <LoginIcon sx={{ color: "primary.glow", fontSize: 30, ml: 1 }} />
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{ color: "primary.glow", typography: { xs: "h5", md: "h4" } }}
+            >
+              התחברות
+            </Typography>
+          </Box>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              <TextField
+                {...register("email")}
+                slotProps={{
+                  input: { dir: "rtl" },
+                  inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                }}
+                label="אימייל"
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email?.message as string}
+              />
 
-        {/* שדה סיסמה */}
-        <TextField
-          {...register("password")}
-          placeholder="Password"
-          type="password"
-          error={!!errors.password}
-          helperText={errors.password?.message as string}
-        />
+              <TextField
+                {...register("password")}
+                slotProps={{
+                  input: { dir: "rtl" },
+                  inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                }}
+                label="סיסמה"
+                type="password"
+                fullWidth
+                error={!!errors.password}
+                helperText={errors.password?.message as string}
+              />
 
-        <Button variant="contained" type="submit">
-          Login
-        </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                fullWidth
+                sx={{ mt: 2, py: 1.5 }}
+                startIcon={<SendIcon sx={{ ml: 1, transform: "rotate(180deg)" }} />}
+              >
+                התחבר
+              </Button>
+            </Box>
+          </form>
+        </Paper>
       </Box>
-    </form>
+    </Container>
   );
 }
 

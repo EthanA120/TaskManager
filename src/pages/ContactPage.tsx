@@ -1,7 +1,7 @@
 import { Container, Typography, Box, TextField, Button, Paper, Grid } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useForm, ValidationError } from '@formspree/react';
-import { CheckCircle, HistoryEdu, Send } from "@mui/icons-material";
+import { CheckCircle, HistoryEdu, Send as SendIcon } from "@mui/icons-material";
 
 const ContactPage = () => {
   const [status, setStatus] = useState("");
@@ -25,7 +25,7 @@ const ContactPage = () => {
               justifyContent: "center",
             }}
           >
-            <HistoryEdu sx={{ color: "primary.glow", fontSize: 40, ml: 1 }} />
+            <HistoryEdu sx={{ color: "primary.glow", fontSize: 38, ml: 1 }} />
             <Typography
               variant="h4"
               component="h1"
@@ -130,7 +130,7 @@ const ContactPage = () => {
                     variant="contained"
                     size="large"
                     type="submit"
-                    startIcon={<Send sx={{ ml: 1, transform: "rotate(180deg)" }} />}
+                    startIcon={<SendIcon sx={{ ml: 1, transform: "rotate(180deg)" }} />}
                     sx={{ py: 1.5, fontSize: "1.1rem" }}
                   >
                     שליחת הודעה

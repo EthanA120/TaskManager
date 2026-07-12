@@ -1,22 +1,25 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Container,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
 import Joi from "joi";
 import { useUser } from "../providers/UserProvider";
 import { Navigate } from "react-router-dom";
 import ROUTES from "../router/routes";
+import { PersonAddOutlined, Send as SendIcon } from "@mui/icons-material";
 
+// 1. הגדרת סכימת הולידציה
 const userSchema = Joi.object({
-  firstName: Joi.string().min(2).max(50).required().messages({
-    "string.empty": "שם פרטי הוא שדה חובה",
-    "string.min": "שם פרטי חייב להכיל לפחות 2 תווים",
-    "any.required": "שם פרטי הוא שדה חובה",
-  }),
-
-  lastName: Joi.string().min(2).max(50).required().messages({
-    "string.empty": "שם משפחה הוא שדה חובה",
-    "string.min": "שם משפחה חייב להכיל לפחות 2 תווים",
-    "any.required": "שם משפחה הוא שדה חובה",
+  nickname: Joi.string().min(2).max(50).required().messages({
+    "string.empty": "כינוי הוא שדה חובה",
+    "string.min": "כינוי חייב להכיל לפחות 2 תווים",
+    "any.required": "כינוי הוא שדה חובה",
   }),
 
   email: Joi.string()
@@ -32,21 +35,6 @@ const userSchema = Joi.object({
     "string.empty": "סיסמה היא שדה חובה",
     "string.min": "הסיסמה חייבת להכיל לפחות 6 תווים",
     "any.required": "סיסמה היא שדה חובה",
-  }),
-
-  phone: Joi.string()
-    .pattern(/^[0-9\-\+]{9,15}$/) // מאפשר מספרים, מקפים ופלוס, בין 9 ל-15 תווים
-    .required()
-    .messages({
-      "string.empty": "מספר טלפון הוא שדה חובה",
-      "string.pattern.base": "מספר הטלפון אינו תקין",
-      "any.required": "מספר טלפון הוא שדה חובה",
-    }),
-
-  address: Joi.string().min(5).required().messages({
-    "string.empty": "כתובת מגורים היא שדה חובה",
-    "string.min": "הכתובת חייבת להיות מפורטת יותר",
-    "any.required": "כתובת מגורים היא שדה חובה",
   }),
 });
 
@@ -71,78 +59,79 @@ function RegisterPage() {
     return <Navigate to={ROUTES.HOME} replace />;
   }
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          maxWidth: 300,
-          mt: 4,
-        }}
-      >
-        {/* שדה אימייל */}
-
-        <TextField
-          {...register("email")}
-          placeholder="Email"
-          error={!!errors.email} // צובע באדום אם יש שגיאה
-          helperText={errors.email?.message as string} // מציג את הודעת השגיאה
-        />
-
-        {/* שדה סיסמה */}
-
-        <TextField
-          {...register("password")}
-          placeholder="Password"
-          type="password"
-          error={!!errors.password}
-          helperText={errors.password?.message as string}
-        />
-        {/* שדה שם פרטי */}
-        <TextField
-          {...register("firstName")}
-          placeholder="First Name"
-          fullWidth
-          error={!!errors.firstName}
-          helperText={errors.firstName?.message as string}
-        />
-
-        {/* שדה שם משפחה */}
-        <TextField
-          {...register("lastName")}
-          placeholder="Last Name"
-          fullWidth
-          error={!!errors.lastName}
-          helperText={errors.lastName?.message as string}
-        />
-
-        {/* שדה טלפון */}
-        <TextField
-          {...register("phone")}
-          placeholder="Phone Number"
-          type="tel"
-          fullWidth
-          error={!!errors.phone}
-          helperText={errors.phone?.message as string}
-        />
-
-        {/* שדה כתובת מגורים */}
-        <TextField
-          {...register("address")}
-          placeholder="Address"
-          multiline // מאפשר לכתובת ארוכה להתפרס על כמה שורות אם תרצה
-          rows={2}
-          fullWidth
-          error={!!errors.address}
-          helperText={errors.address?.message as string}
-        />
-
-        <Button variant="contained" type="submit">
-          Sign up
-        </Button>
+    <Container maxWidth="xs" dir="rtl">
+      <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Paper elevation={3} sx={{ p: 4, width: "100%", borderRadius: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 3,
+              justifyContent: "center",
+            }}
+          >
+            <PersonAddOutlined sx={{ color: "primary.glow", fontSize: 30, ml: 1 }} />
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{ color: "primary.glow", typography: { xs: "h5", md: "h4" } }}
+            >
+              הרשמה
+            </Typography>
+          </Box>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              <TextField
+                {...register("nickname")}
+                label="כינוי"
+                fullWidth
+                error={!!errors.nickname}
+                helperText={errors.nickname?.message as string}
+                slotProps={{
+                  inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                }}
+              />
+              <TextField
+                {...register("email")}
+                label="אימייל"
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email?.message as string}
+                slotProps={{
+                  inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                }}
+              />
+              <TextField
+                {...register("password")}
+                label="סיסמה"
+                type="password"
+                fullWidth
+                error={!!errors.password}
+                helperText={errors.password?.message as string}
+                slotProps={{
+                  inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                }}
+              />
+              <Button
+                variant="contained"
+                type="submit"
+                fullWidth
+                sx={{ mt: 2, py: 1.5 }}
+                startIcon={<SendIcon sx={{ ml: 1, transform: "rotate(180deg)" }} />}
+              >
+                הרשמה
+              </Button>
+            </Box>
+          </form>
+        </Paper>
       </Box>
-    </form>
+    </Container>
   );
 }
 

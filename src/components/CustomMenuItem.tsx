@@ -11,8 +11,8 @@ interface CustomMenuItemProps {
 export default function CustomMenuItem(props: CustomMenuItemProps) {
 
   return (
-    <MenuItem key={props.key} onClick={() => { props.navigate(); props.handleFunction(); }}>
-      <Typography sx={{ textAlign: "center", fontFamily: "cursive"}}>{props.icon()} {props.text}</Typography>
+    <MenuItem dir="rtl" key={props.key} onClick={() => { props.navigate(); props.handleFunction(); }}>
+      <Typography sx={{ textAlign: "center", fontFamily: "heebo, sans-serif"}}>{props.icon()} {props.text}</Typography>
     </MenuItem>
   );
 }

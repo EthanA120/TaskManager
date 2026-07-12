@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 
 const navLinkStyle = {
-  fontFamily: "cursive",
+  fontFamily: "heebo, sans-serif",
   textDecoration: "none",
   padding: "8px 10px",
   margin: "0 1px",

@@ -56,31 +56,31 @@ function Header() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "primary.main" }}>
+    <AppBar position="static" sx={{ backgroundColor: "primary.main" }} dir="rtl">
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
           <Box
             sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={() => navigate(ROUTES.HOME)}
           >
-            <AssignmentIcon sx={{ mr: 1 }} />
+            <AssignmentIcon sx={{ ml: 1 }} />
             <Typography
               variant="h6"
               component="div"
               sx={{
-                mr: 2,
-                fontFamily: "cursive",
+                ml: 2,
+                fontFamily: "heebo, sans-serif",
                 letterSpacing: ".05rem",
               }}
             >
-              Task Manager
+              ניהול משימות
             </Typography>
           </Box>
 
-          <Box sx={{ display: { xs: "none", md: "flex", marginLeft: 5 } }}>
-            <NavItem to={ROUTES.HOME} label="Home" />
-            <NavItem to={ROUTES.ABOUT} label="About" />
-            <NavItem to={ROUTES.CONTACT} label="Contact" />
+          <Box sx={{ display: { xs: "none", md: "flex", marginRight: 5 } }}>
+            <NavItem to={ROUTES.HOME} label="בית" />
+            <NavItem to={ROUTES.ABOUT} label="על האתר" />
+            <NavItem to={ROUTES.CONTACT} label="צור קשר" />
           </Box>
         </Box>
 
@@ -104,7 +104,7 @@ function Header() {
               id="menu-appbar-user"
               anchorEl={anchorElUser}
               anchorOrigin={{
-                vertical: "top",
+                vertical: "bottom",
                 horizontal: "right",
               }}
               keepMounted
@@ -121,14 +121,14 @@ function Header() {
                   key="profile"
                   navigate={() => navigate(ROUTES.HOME)}
                   handleFunction={() => handleCloseUserMenu()}
-                  icon={() => <ManageAccountsOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} />}
-                  text="Profile" />,
+                  icon={() => <ManageAccountsOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                  text={user.nickname} />,
                   <CostumeMenuItem
                   key="logout"
                   navigate={() => logout()}
                   handleFunction={() => handleCloseUserMenu()}
-                  icon={() => <Logout sx={{ verticalAlign: "middle", marginRight: 1 }} />}
-                  text="Logout" />
+                  icon={() => <Logout sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                  text="יציאה" />
                 ]
               ) : (
                 [
@@ -136,22 +136,22 @@ function Header() {
                     key="login"
                     navigate={() => navigate(ROUTES.LOGIN)}
                     handleFunction={() => handleCloseUserMenu()}
-                    icon={() => <Login sx={{ verticalAlign: "middle", marginRight: 1 }} />}
-                    text="Log In"
+                    icon={() => <Login sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                    text="כניסה"
                   />,
                   <CostumeMenuItem
                     key="register"
                     navigate={() => navigate(ROUTES.REGISTER)}
                     handleFunction={() => handleCloseUserMenu()}
-                    icon={() => <PersonAddOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} />}
-                    text="Register"
+                    icon={() => <PersonAddOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                    text="הרשמה"
                   />
                 ]
               )}
             </Menu>
           </Box>
 
-          <Box sx={{ display: { xs: "flex", md: "none" }, ml: 1 }}>
+          <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
             <IconButton
               size="large"
               aria-label="navigation menu"
@@ -166,7 +166,7 @@ function Header() {
               id="menu-appbar-nav"
               anchorEl={anchorElNav}
               anchorOrigin={{
-                vertical: "top",
+                vertical: "bottom",
                 horizontal: "right",
               }}
               keepMounted
@@ -181,13 +181,13 @@ function Header() {
               }}
             >
               <MenuItem onClick={() => handleMenuItemClick(ROUTES.HOME)}>
-                <Typography sx={{ textAlign: "center", fontFamily: "cursive" }}><HomeOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> Home</Typography>
+                <Typography sx={{ textAlign: "center" }}><HomeOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> Home</Typography>
               </MenuItem>
               <MenuItem onClick={() => handleMenuItemClick(ROUTES.ABOUT)}>
-                <Typography sx={{ textAlign: "center", fontFamily: "cursive" }}><InfoOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> About</Typography>
+                <Typography sx={{ textAlign: "center" }}><InfoOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> About</Typography>
               </MenuItem>
               <MenuItem onClick={() => handleMenuItemClick(ROUTES.CONTACT)}>
-                <Typography sx={{ textAlign: "center", fontFamily: "cursive" }}><EmailOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> Contact</Typography>
+                <Typography sx={{ textAlign: "center" }}><EmailOutlined sx={{ verticalAlign: "middle", marginRight: 1 }} /> Contact</Typography>
               </MenuItem>
             </Menu>
           </Box>

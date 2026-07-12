@@ -66,11 +66,11 @@ const AboutPage: React.FC = () => {
             </Typography>
             <List>
               {features.map((feature, index) => (
-                <ListItem key={index} disablePadding sx={{ mb: 1 }}>
-                  <ListItemIcon sx={{ minWidth: 40 }}>
+                <ListItem key={index} disablePadding sx={{ mb: 1, display: 'flex' }}>
+                  <ListItemIcon sx={{ minWidth: 40, alignItems: "center"}}>
                     <CheckCircleIcon color="success" />
+                  <ListItemText primary={feature} sx={{ mr: 2, textAlign: "right" }} />
                   </ListItemIcon>
-                  <ListItemText primary={feature} />
                 </ListItem>
               ))}
             </List>

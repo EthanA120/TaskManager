@@ -6,7 +6,6 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import app from "../config/firebase";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -14,8 +13,10 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import {type User } from "../types/User";
-import { addUser ,getUserById} from "../services/usersDataServiceFireBase";
+
+import app from "../config/firebase";
+import { addUser, getUserById } from "../services/usersDataServiceFireBase";
+import { type User } from "../types/User";
 
 const UserContext = createContext<{
   user: User | null;
@@ -27,11 +28,12 @@ const UserContext = createContext<{
 function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const auth = getAuth(app);
+
   const signup = useCallback(
-    async ({email, password,...userData}: {email: string; password: string; userData:any}) => {
-     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-     // Add additional user data to Firestore
-     await addUser({ id: userCredential.user.uid,email: userCredential.user.email||"",...userData } as any);
+    async ({ email, password, ...userData }: { email: string; password: string; userData: any }) => {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Add additional user data to Firestore
+      await addUser({ id: userCredential.user.uid, email: userCredential.user.email || "", ...userData } as any);
     },
     [auth],
   );
@@ -44,24 +46,25 @@ function UserProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await signOut(auth);
     setUser(null);
-    window.location.href = "/";
+    window.location.href = "/login";
   }, [auth]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if(currentUser) {
-      const userData = await getUserById(currentUser.uid);
-      if(userData) {
-        setUser(userData);
+      if (currentUser) {
+        const userData = await getUserById(currentUser.uid);
+        if (userData) {
+          setUser(userData);
+        }
+        else {
+          setUser(currentUser as any);
+        }
       }
-      else {
-      setUser(currentUser as any);
-      }
-    }});
+    });
 
     return unsubscribe;
   }, []);
-console.log(user);
+  console.log(user);
 
   return (
     <UserContext.Provider value={{ user, signup, login, logout }}>
