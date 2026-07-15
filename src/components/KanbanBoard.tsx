@@ -54,6 +54,7 @@ function KanbanBoard({
           overflowX: "auto",
           pb: 2,
           alignItems: "flex-start",
+          direction: "rtl",
         }}
       >
         {columns.map((column) => (

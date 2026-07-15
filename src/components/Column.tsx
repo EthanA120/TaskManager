@@ -41,7 +41,7 @@ function Column({
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
-        bgcolor: isDropTarget ? "action.hover" : "background.paper",
+        bgcolor: isDropTarget ? "action.hover" : column.color,
         transition: "background-color 0.2s",
       }}
     >

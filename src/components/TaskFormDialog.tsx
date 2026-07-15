@@ -23,9 +23,9 @@ interface TaskFormDialogProps {
 function TaskFormDialog({
   open,
   onClose,
+  handleSave,
   initialValues,
   columns,
-  handleSave,
 }: TaskFormDialogProps) {
   const { control, handleSubmit, reset } = useForm<Task>({
     defaultValues: initialValues ?? {
@@ -39,9 +39,7 @@ function TaskFormDialog({
   });
 
   const onSubmit = (data: Task) => {
-    // הדפסת האובייקט לקונסול כפי שביקשת
     handleSave(data);
-
     // איפוס הטופס וסגירה
     reset();
     onClose();
@@ -163,7 +161,7 @@ function TaskFormDialog({
             ביטול
           </Button>
           <Button type="submit" variant="contained" color="primary">
-            {initialValues ? "עריכה" : "צור משימה"}
+            {initialValues ? "שמור עריכה" : "צור משימה"}
           </Button>
         </DialogActions>
       </form>

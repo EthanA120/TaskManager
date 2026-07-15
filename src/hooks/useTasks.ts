@@ -7,11 +7,15 @@ import {
   updateTask,
   deleteTask,
 } from "../services/tasksDataServiceFireBase"; // ודא שהנתיב תקין
+import { useAuthState } from "react-firebase-hooks/auth"; // ייבוא של ה-hook
+import { auth } from "../config/firebase"; // ייבוא של אובייקט ה-auth
 
 function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading,setIsLoading] = useState(true);
   const [error,setError] = useState<string | null>(null);
+
+  const [user] = useAuthState(auth); // קבלת המשתמש המחובר
 
   const { raiseSnack } = useContext(SnackContext) as any;
 
@@ -38,10 +42,16 @@ function useTasks() {
         raiseSnack("error", "יש לבחור עמודה למשימה");
         return;
       }
+      if (!user) {
+        raiseSnack("error", "יש להתחבר כדי להוסיף משימה");
+        return;
+      }
 
       const newTaskData = {
         ...task,
         likes: 0,
+        color: task.color || "#ffffff",
+        userId: user.uid, // הוספת מזהה המשתמש למשימה
       };
 
       try {
@@ -59,7 +69,7 @@ function useTasks() {
         raiseSnack("error", "התרחשה שגיאה ביצירת המשימה");
       }
     },
-    [raiseSnack],
+    [raiseSnack, user],
   );
 
   // UPDATE - Move Column (Optimistic Update)

@@ -1,6 +1,6 @@
-export type Column = {
+export type Board = {
   id: string;
   name: string;
-  board: string;
+  description: string;
   color: string;
 };

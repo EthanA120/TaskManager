@@ -1,40 +1,62 @@
+import { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   TextField,
+  DialogActions,
   Button,
-  Stack,
   Box,
   Typography,
+  Stack,
 } from "@mui/material";
-import cardsColors from "../utils/cardColors";
-import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import type { Column } from "../types/Column";
+import boardColors from "../utils/cardColors";
+import { useForm, Controller} from "react-hook-form";
+import { joiResolver } from "@hookform/resolvers/joi";
+import type { Board } from "../types/Board";
+import Joi from "joi";
 
-interface ColumnFormValues {
+const boardSchema = Joi.object<BoardFormData>({
+  name: Joi.string().min(2).max(20).required().messages({
+    "string.empty": "שם הלוח הוא שדה חובה",
+    "string.min": "שם הלוח חייב להכיל לפחות 2 תווים",
+    "string.max": "שם הלוח יכול להכיל עד 20 תווים",
+    "any.required": "שם הלוח הוא שדה חובה",
+  }),
+  description: Joi.string().max(200).allow("").messages({
+    "string.max": "תיאור הלוח יכול להכיל עד 200 תווים",
+  }),
+  color: Joi.string().required(),
+});
+
+interface BoardFormData {
   name: string;
   description: string;
   color: string;
 }
 
-interface ColumnFormDialogProps {
+interface BoardFormDialogProps {
   open: boolean;
   onClose: () => void;
-  initialValues?: Column;
-  handleSave: (data: Column | ColumnFormValues) => void;
+  initialValues?: Board;
+  handleSave: (data: BoardFormData, id?: string) => void;
 }
 
-function ColumnFormDialog({
+function BoardFormDialog({
   open,
   onClose,
-  initialValues,
   handleSave,
-}: ColumnFormDialogProps) {
-  const { control, handleSubmit, reset, setValue } = useForm<ColumnFormValues>({
-    defaultValues: initialValues ?? { name: "", color: "#FFFFFF" },
+  initialValues,
+}: BoardFormDialogProps) {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { isSubmitting },
+  } = useForm<BoardFormData>({
+    resolver: joiResolver(boardSchema),
+    defaultValues: { name: "", description: "", color: "#FFFFFF" },
   });
 
   useEffect(() => {
@@ -42,34 +64,30 @@ function ColumnFormDialog({
       if (initialValues) {
         // השתמש ב-setValue כדי להפעיל ולידציה מיידית
         setValue("name", initialValues.name, { shouldValidate: true });
+        setValue("description", initialValues.description, { shouldValidate: true });
         setValue("color", initialValues.color, { shouldValidate: true });
       } else {
-        reset({ name: "", color: "#FFFFFF" });
+        reset({ name: "", description: "", color: "#FFFFFF" });
       }
     }
   }, [open, initialValues, reset]);
 
-
-
-
-  const onSubmit = (data: ColumnFormValues) => {
-    if (initialValues) {
-      handleSave({ ...initialValues, ...data });
-    } else {
-      handleSave(data);
-    }
+  const onSubmit = (data: BoardFormData) => {
+    handleSave(data, initialValues?.id);
     reset();
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
-        {initialValues ? "עריכת עמודה" : "הוספת עמודה חדשה"}
+        {initialValues ? "עריכת לוח" : "הוספת לוח חדש"}
       </DialogTitle>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Stack spacing={3}>
+            {/* כותרת המשימה */}
             <Controller
               name="name"
               control={control}
@@ -77,11 +95,24 @@ function ColumnFormDialog({
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
-                  label="שם העמודה"
+                  label="כותרת"
                   fullWidth
                   error={!!error}
                   helperText={error?.message}
-                  autoFocus
+                />
+              )}
+            />
+
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="תיאור"
+                  fullWidth
+                  multiline
+                  rows={3}
                 />
               )}
             />
@@ -94,7 +125,7 @@ function ColumnFormDialog({
                 <div>
                   <Typography gutterBottom>בחר צבע</Typography>
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    {cardsColors.map(
+                    {boardColors.map(
                       (color) => (
                         <Box
                           key={color}
@@ -125,12 +156,13 @@ function ColumnFormDialog({
             />
           </Stack>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={onClose} color="inherit">
             ביטול
           </Button>
-          <Button type="submit" variant="contained" color="primary">
-            {initialValues ? "עריכה" : "צור עמודה"}
+          <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+            {initialValues ? "שמור שינויים" : "צור לוח"}
           </Button>
         </DialogActions>
       </form>
@@ -138,4 +170,4 @@ function ColumnFormDialog({
   );
 }
 
-export default ColumnFormDialog;
+export default BoardFormDialog;
