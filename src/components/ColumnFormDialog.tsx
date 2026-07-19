@@ -13,75 +13,84 @@ import cardsColors from "../utils/cardColors";
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { Column } from "../types/Column";
+import { joiResolver } from "@hookform/resolvers/joi";
+import Joi from "joi";
 
-interface ColumnFormValues {
+export interface ColumnFormData {
   name: string;
-  description: string;
   color: string;
 }
+
+const columnSchema = Joi.object<ColumnFormData>({
+  name: Joi.string().min(2).max(20).required().messages({
+    "string.empty": "שם הלוח הוא שדה חובה",
+    "string.min": "שם הלוח חייב להכיל לפחות 2 תווים",
+    "string.max": "שם הלוח יכול להכיל עד 20 תווים",
+    "any.required": "שם הלוח הוא שדה חובה",
+  }),
+
+  color: Joi.string().required(),
+});
 
 interface ColumnFormDialogProps {
   open: boolean;
   onClose: () => void;
   initialValues?: Column;
-  handleSave: (data: Column | ColumnFormValues) => void;
+  handleSave: (data: Column | Omit<Column, "id" | "board">) => void;
 }
 
 function ColumnFormDialog({
   open,
   onClose,
-  initialValues,
   handleSave,
+  initialValues,
 }: ColumnFormDialogProps) {
-  const { control, handleSubmit, reset, setValue } = useForm<ColumnFormValues>({
-    defaultValues: initialValues ?? { name: "", color: "#FFFFFF" },
+  const {
+    control, handleSubmit, reset, formState: { errors }
+  } = useForm<ColumnFormData>({
+    resolver: joiResolver(columnSchema), // חיבור הסכימה ל-React Hook Form
+        mode: 'onTouched', // ולידציה תתבצע ברגע שהמשתמש יוצא מהשדה
+        defaultValues: { name: "", color: "#FFFFFF" },
   });
 
   useEffect(() => {
-    if (open) {
-      if (initialValues) {
-        // השתמש ב-setValue כדי להפעיל ולידציה מיידית
-        setValue("name", initialValues.name, { shouldValidate: true });
-        setValue("color", initialValues.color, { shouldValidate: true });
-      } else {
-        reset({ name: "", color: "#FFFFFF" });
+      if (open) {
+        reset({
+          name: initialValues?.name ?? "",
+          color: initialValues?.color ?? "#FFFFFF",
+        });
       }
-    }
-  }, [open, initialValues, reset]);
-
-
-
-
-  const onSubmit = (data: ColumnFormValues) => {
-    if (initialValues) {
-      handleSave({ ...initialValues, ...data });
-    } else {
-      handleSave(data);
-    }
-    reset();
-    onClose();
-  };
+    }, [open, initialValues, reset]);
+  
+    const onSubmit = (data: ColumnFormData) => {
+      if (initialValues) {
+        handleSave({ ...initialValues, ...data });
+      } else {
+        // When creating a new column, include required fields from Column type
+        handleSave({ ...data, createdAt: Number(new Date().toISOString()) });
+      }
+      onClose();
+    };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>
         {initialValues ? "עריכת עמודה" : "הוספת עמודה חדשה"}
       </DialogTitle>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Stack spacing={3}>
             <Controller
               name="name"
               control={control}
-              rules={{ required: "זהו שדה חובה" }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
                   label="שם העמודה"
                   fullWidth
                   error={!!error}
-                  helperText={error?.message}
-                  autoFocus
+                  helperText={errors.name?.message}
                 />
               )}
             />
@@ -89,7 +98,6 @@ function ColumnFormDialog({
             <Controller
               name="color"
               control={control}
-              rules={{ required: "יש לבחור צבע" }}
               render={({ field, fieldState: { error } }) => (
                 <div>
                   <Typography gutterBottom>בחר צבע</Typography>

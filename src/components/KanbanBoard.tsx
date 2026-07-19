@@ -3,6 +3,7 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { memo } from "react";
 import type { Column as ColumnType } from "../types/Column";
 import type { Task } from "../types/Task";
+import { type TaskSortOption } from "../pages/BoardPage";
 import Column from "./Column";
 
 interface KanbanBoardProps {
@@ -10,6 +11,7 @@ interface KanbanBoardProps {
   tasks: Task[];
   columnIds: Set<string>;
   onMoveTask: (taskId: string, columnId: string) => void;
+  onAddingTask: (column: ColumnType) => void;  onSortingTask: (sortBy: TaskSortOption, columnId: string) => void;
   onEditColumn: (column: ColumnType) => void;
   onDeleteColumn: (id: string) => void;
   handleEditTask: (data: Task) => void;
@@ -22,6 +24,8 @@ function KanbanBoard({
   tasks,
   columnIds,
   onMoveTask,
+  onAddingTask,
+  onSortingTask,
   onEditColumn,
   onDeleteColumn,
   handleEditTask,
@@ -50,6 +54,7 @@ function KanbanBoard({
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           gap: 2,
           overflowX: "auto",
           pb: 2,
@@ -63,6 +68,8 @@ function KanbanBoard({
             column={column}
             tasks={tasks.filter((t) => t.column === column.id)}
             columns={columns}
+            onAddingTask={onAddingTask}
+            onSortingTask={onSortingTask}
             onEditColumn={onEditColumn}
             onDeleteColumn={onDeleteColumn}
             handleEditTask={handleEditTask}

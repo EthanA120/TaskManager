@@ -29,6 +29,7 @@ import ROUTES from "../router/routes";
 import ViewKanbanOutlinedIcon from "@mui/icons-material/ViewKanbanOutlined";
 import boardColors from "../utils/cardColors";
 import BoardFormDialog from "../components/BoardFormDialog";
+import type { BoardFormData } from "../components/BoardFormDialog";
 import type { Board } from "../types/Board";
 
 function HomePage() {
@@ -55,7 +56,7 @@ function HomePage() {
     handleGetBoards();
   }, [handleGetBoards]);
 
-  const onSaveBoard = (data: Omit<Board, "id">, id?: string) => {
+  const onSaveBoard = (data: BoardFormData, id?: string) => {
     if (id) {
       handleEditBoard(id, data);
     } else {
@@ -93,7 +94,7 @@ function HomePage() {
   }
 
   return (
-    <Container dir="rtl" maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container dir="rtl" maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -126,7 +127,7 @@ function HomePage() {
         </Paper>
       ) : (
         <Grid container spacing={3}>
-          {boards.toReversed().map((board) => (
+          {boards.map((board) => (
             <Grid size={4} sx={{ xs: 12, sm: 6, md: 4 }} key={board.id}>
               <Card
                 sx={{

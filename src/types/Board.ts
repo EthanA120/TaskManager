@@ -3,4 +3,5 @@ export type Board = {
   name: string;
   description: string;
   color: string;
+  createdAt: number;
 };

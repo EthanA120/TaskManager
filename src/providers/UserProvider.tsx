@@ -20,12 +20,14 @@ import { type User } from "../types/User";
 
 const UserContext = createContext<{
   user: User | null;
+  loading: boolean;
   signup: (userData: any) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 } | undefined>(undefined);
 
 function UserProvider({ children }: { children: ReactNode }) {
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const auth = getAuth(app);
 
@@ -51,6 +53,7 @@ function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
       if (currentUser) {
         const userData = await getUserById(currentUser.uid);
         if (userData) {
@@ -59,15 +62,17 @@ function UserProvider({ children }: { children: ReactNode }) {
         else {
           setUser(currentUser as any);
         }
+      } else {
+        setUser(null);
       }
+      setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
-  console.log(user);
+  }, [auth]);
 
   return (
-    <UserContext.Provider value={{ user, signup, login, logout }}>
+    <UserContext.Provider value={{ user, loading, signup, login, logout }}>
       {children}
     </UserContext.Provider>
   );

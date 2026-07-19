@@ -1,16 +1,17 @@
-import { Box, IconButton, Paper, Typography } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from "@mui/icons-material/Clear";
+import { Box, IconButton, Paper, Typography, Menu, MenuItem } from "@mui/material";
+import { AddBox as AddBoxIcon, Edit as EditIcon, Clear as ClearIcon, Sort as SortIcon } from "@mui/icons-material";
 import { useDroppable } from "@dnd-kit/react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import type { Column as ColumnType } from "../types/Column";
 import type { Task } from "../types/Task";
+import { type TaskSortOption } from "../pages/BoardPage";
 import DraggableTaskCard from "./DraggableTaskCard";
 
 interface ColumnProps {
   column: ColumnType;
   tasks: Task[];
   columns: ColumnType[];
+  onAddingTask: (column: ColumnType) => void;  onSortingTask: (sortBy: TaskSortOption, columnId: string) => void;
   onEditColumn: (column: ColumnType) => void;
   onDeleteColumn: (id: string) => void;
   handleEditTask: (data: Task) => void;
@@ -22,6 +23,8 @@ function Column({
   column,
   tasks,
   columns,
+  onAddingTask,
+  onSortingTask,
   onEditColumn,
   onDeleteColumn,
   handleEditTask,
@@ -32,12 +35,28 @@ function Column({
     id: column.id,
   });
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClickSort = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseSort = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSortSelect = (sortBy: TaskSortOption) => {
+    onSortingTask(sortBy, column.id);
+    handleCloseSort();
+  };
+
   return (
     <Paper
       elevation={2}
       sx={{
         minWidth: 280,
-        maxWidth: 320,
+        maxWidth: "100%",
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
@@ -45,8 +64,11 @@ function Column({
         transition: "background-color 0.2s",
       }}
     >
+      {/* פקודות עמודה */}
       <Box
         sx={{
+          minWidth: 280,
+          maxWidth: "20vw",
           p: 1.5,
           borderBottom: 1,
           borderColor: "divider",
@@ -55,10 +77,44 @@ function Column({
           justifyContent: "space-between",
         }}
       >
-        <Typography variant="h6" component="h2" noWrap>
+        <Typography variant="h5" component="h2" noWrap>
           {column.name}
         </Typography>
         <Box>
+          <IconButton
+            size="small"
+            onClick={handleClickSort}
+            aria-label="מיון"
+          >
+            <SortIcon fontSize="small" />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleCloseSort}
+          >
+            <MenuItem onClick={() => handleSortSelect("title")}>
+              מיין לפי שם
+            </MenuItem>
+            <MenuItem onClick={() => handleSortSelect("dueDate")}>
+              מיין לפי תאריך יעד
+            </MenuItem>
+            <MenuItem onClick={() => handleSortSelect("priority")}>
+              מיין לפי עדיפות
+            </MenuItem>
+            <MenuItem onClick={() => handleSortSelect("status")}>
+              מיין לפי סטטוס
+            </MenuItem>
+          </Menu>
+          
+          <IconButton
+            size="small"
+            onClick={() => onAddingTask(column)}
+            aria-label="הוספת משימה"
+          >
+            <AddBoxIcon fontSize="small" />
+          </IconButton>
+
           <IconButton
             size="small"
             onClick={() => onEditColumn(column)}
@@ -66,6 +122,7 @@ function Column({
           >
             <EditIcon fontSize="small" />
           </IconButton>
+
           <IconButton
             size="small"
             onClick={() => onDeleteColumn(column.id)}
@@ -76,14 +133,15 @@ function Column({
         </Box>
       </Box>
 
+      {/* מיכל פתקים */}
       <Box
         ref={ref}
         sx={{
           p: 1.5,
           flex: 1,
           minHeight: 200,
+          overflowX: "scroll",
           display: "flex",
-          flexDirection: "column",
           gap: 1.5,
         }}
       >

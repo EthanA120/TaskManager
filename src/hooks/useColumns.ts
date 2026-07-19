@@ -7,10 +7,14 @@ import {
 	updateColumn,
 	deleteColumn,
 } from "../services/columnsDataServiceFireBase"; // ודא שהקובץ קיים והנתיב תקין
-import { getTasks } from "../services/tasksDataServiceFireBase"; // הקריאה החדשה למשימות
+import { type Task } from "../types/Task";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../config/firebase";
 
 function useColumns() {
 	const [columns, setColumns] = useState<Column[]>([]);
+	const [user] = useAuthState(auth);
+
 	const { raiseSnack } = useContext(SnackContext) as {
 		raiseSnack: (
 			color: "success" | "error" | "warning" | "info",
@@ -19,22 +23,35 @@ function useColumns() {
 	};
 
 	// READ
-	const handleGetColumns = useCallback(async () => {
-		try {
-			const savedColumns = await getColumns();
-			setColumns(savedColumns);
+	const handleGetColumns = useCallback(async (boardId?: string) => {
+		if (!user) {
+			setColumns([]);
+			return;
+		}
+
+    try {
+			let savedColumns = await getColumns();
+			if (boardId) {
+				savedColumns = savedColumns.filter(column => column.board === boardId);
+			}
+			setColumns(savedColumns.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0)));
 		} catch {
 			raiseSnack("error", "התרחשה שגיאה בייבוא הנתונים");
 		}
-	}, [raiseSnack]);
+	}, [raiseSnack, setColumns, user]);
 
 	// CREATE
 	const handleAddColumn = useCallback(
-		async (column: Pick<Column, "name">) => {
+		async (column: Omit<Column, "id" | "board">, boardId?: string) => {
+			if (!boardId) {
+				raiseSnack("error", "לא זוהה מזהה לוח תקין.");
+				return;
+			}
 			const columnData = {
 				name: column.name,
-				board: "",
-				color: "#FFFFFF",
+				board: boardId,
+				color: column.color || "#FFFFFF",
+        createdAt: Number(new Date()) || 0,
 			};
 			try {
 				// המתנה ליצירת העמודה וקבלת ה-ID מפיירבייס
@@ -74,11 +91,9 @@ function useColumns() {
 
 	// DELETE
 	const handleDeleteColumn = useCallback(
-		async (id: string) => {
+		async (id: string, tasks: Task[]) => {
 			try {
-				// משיכת המשימות מפיירבייס כדי לבדוק אם העמודה בשימוש
-				const tasks = await getTasks();
-				if (tasks.some((t) => t.column === id)) {
+				if (tasks.some(task => task.column === id)) {
 					raiseSnack("warning", "שים לב! לא ניתן למחוק עמודה שמכילה משימות");
 					return;
 				}

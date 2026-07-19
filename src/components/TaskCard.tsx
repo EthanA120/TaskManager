@@ -9,12 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import type { Column } from "../types/Column";
 import type { Task } from "../types/Task";
 import ROUTES from "../router/routes";
 import EditIcon from "@mui/icons-material/Edit";
-import TaskFormDialog from "./TaskFormDialog";
-import { useState, memo, useContext } from "react";
+import { memo, useContext } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
@@ -22,23 +20,25 @@ import {
   ProjectThemeContext,
   type ThemeContextType,
 } from "../providers/ProjectThemeProvider";
+
+
 interface TaskProps {
   task: Task;
-  columns: Column[];
   handleEditTask: (data: Task) => void;
   handleDeleteTask: (id: string) => void;
   updateLikes: (id: string, action: "inc" | "dec") => void;
 }
+
 function TaskCard({
   task,
-  columns,
   handleEditTask,
   handleDeleteTask,
   updateLikes,
 }: TaskProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { isDark } = useContext(ProjectThemeContext) as ThemeContextType;
+
+
   return (
     <Card
       sx={{
@@ -72,8 +72,8 @@ function TaskCard({
           />
         </Box>
       </CardActionArea>
-      <CardActions>
-        <IconButton onClick={() => setIsOpen(true)} aria-label="Edit task">
+      <CardActions disableSpacing>
+        <IconButton onClick={() => handleEditTask(task)} aria-label="Edit task">
           <EditIcon />
         </IconButton>
         <IconButton>
@@ -99,15 +99,6 @@ function TaskCard({
         </IconButton>
         <Typography>{task.likes}</Typography>
       </CardActions>
-      {isOpen && (
-        <TaskFormDialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          initialValues={task}
-          columns={columns}
-          handleSave={handleEditTask}
-        />
-      )}
     </Card>
   );
 }

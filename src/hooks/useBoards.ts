@@ -8,11 +8,14 @@ import {
   deleteBoard,
 } from "../services/boardsDataServiceFireBase"; // ודא שהקובץ קיים והנתיב תקין
 import { getColumns } from "../services/columnsDataServiceFireBase"; // הקריאה החדשה למשימות
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../config/firebase";
 
 function useBoards() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user] = useAuthState(auth);
   const { raiseSnack } = useContext(SnackContext) as {
     raiseSnack: (
       color: "success" | "error" | "warning" | "info",
@@ -24,6 +27,12 @@ function useBoards() {
   const handleGetBoards = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    if (!user) {
+      setBoards([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const savedBoards = await getBoards();
       setBoards(savedBoards);
@@ -34,7 +43,7 @@ function useBoards() {
     } finally {
       setIsLoading(false);
     }
-  }, [raiseSnack]);
+  }, [raiseSnack, user]);
 
   // CREATE
   const handleAddBoard = useCallback(
@@ -43,6 +52,7 @@ function useBoards() {
         name: board.name,
         description: board.description || "",
         color: board.color || "#FFFFFF",
+        createdAt: Number(new Date()),
       };
       try {
         // המתנה ליצירת הלוח וקבלת ה-ID מפיירבייס
@@ -51,6 +61,7 @@ function useBoards() {
         const newBoard: Board = {
           ...boardData,
           id: newId,
+          createdAt: Number(new Date()),
         };
 
         setBoards((prev) => [...prev, newBoard]);

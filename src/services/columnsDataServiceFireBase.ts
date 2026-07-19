@@ -6,16 +6,15 @@ import {
 	doc,
 	updateDoc,
 	deleteDoc,
+	getDoc,
 } from "firebase/firestore";
 
 import app from "../config/firebase";
 import type { Column } from "../types/Column";
 
-// אתחול החיבור למסד הנתונים
 const db = getFirestore(app);
 const columnsCollectionName = "columns";
 const columnsCollection = collection(db, columnsCollectionName);
-
 
 // הוספת עמודה
 export const addColumn = async (
@@ -30,16 +29,16 @@ export const addColumn = async (
 	}
 };
 
-// ייבוא נתונים מהפיירבייס
+// שליפת כל העמודות
 export const getColumns = async (): Promise<Column[]> => {
 	try {
 		const querySnapshot = await getDocs(columnsCollection);
 		const columns: Column[] = querySnapshot.docs.map(
 			(doc) =>
-				({
-					id: doc.id,
-					...doc.data(),
-				}) as Column,
+			({
+				id: doc.id,
+				...doc.data(),
+			}) as Column,
 		);
 		return columns;
 	} catch (error) {
@@ -48,7 +47,24 @@ export const getColumns = async (): Promise<Column[]> => {
 	}
 };
 
-// עדכון
+// שליפת עמודה לפי ID
+export const getColumnById = async (id: string): Promise<Column | null> => {
+	const columnDocRef = doc(db, columnsCollectionName, id);
+	try {
+		const docSnap = await getDoc(columnDocRef);
+		if (docSnap.exists()) {
+			return { id: docSnap.id, ...docSnap.data() } as Column;
+		} else {
+			console.log("No such column document!");
+			return null;
+		}
+	} catch (error) {
+		console.error("Error fetching column:", error);
+		throw error;
+	}
+};
+
+// עדכון עמודה
 export const updateColumn = async (
 	id: string,
 	updatedData: Partial<Column>,
@@ -62,7 +78,7 @@ export const updateColumn = async (
 	}
 };
 
-// מחיקה
+// מחיקת עמודה
 export const deleteColumn = async (id: string): Promise<void> => {
 	try {
 		const columnDocRef = doc(db, columnsCollectionName, id);

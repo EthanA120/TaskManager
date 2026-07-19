@@ -11,10 +11,16 @@ import {
   Stack,
 } from "@mui/material";
 import boardColors from "../utils/cardColors";
-import { useForm, Controller} from "react-hook-form";
-import { joiResolver } from "@hookform/resolvers/joi";
+import { useForm, Controller } from "react-hook-form";
 import type { Board } from "../types/Board";
+import { joiResolver } from "@hookform/resolvers/joi";
 import Joi from "joi";
+
+export interface BoardFormData {
+  name: string;
+  description: string;
+  color: string;
+}
 
 const boardSchema = Joi.object<BoardFormData>({
   name: Joi.string().min(2).max(20).required().messages({
@@ -29,17 +35,11 @@ const boardSchema = Joi.object<BoardFormData>({
   color: Joi.string().required(),
 });
 
-interface BoardFormData {
-  name: string;
-  description: string;
-  color: string;
-}
-
 interface BoardFormDialogProps {
   open: boolean;
   onClose: () => void;
   initialValues?: Board;
-  handleSave: (data: BoardFormData, id?: string) => void;
+  handleSave: (data: BoardFormData, id?: string, color?: string, createdAt?: number) => void;
 }
 
 function BoardFormDialog({
@@ -49,32 +49,27 @@ function BoardFormDialog({
   initialValues,
 }: BoardFormDialogProps) {
   const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { isSubmitting },
+    control, handleSubmit, reset, formState: { errors }
   } = useForm<BoardFormData>({
-    resolver: joiResolver(boardSchema),
+    resolver: joiResolver(boardSchema), // חיבור הסכימה ל-React Hook Form
+    mode: 'onTouched', // ולידציה תתבצע ברגע שהמשתמש יוצא מהשדה
     defaultValues: { name: "", description: "", color: "#FFFFFF" },
   });
 
+  // מאפס את הטופס עם הערכים ההתחלתיים (במצב עריכה)
+  // או עם ערכים ריקים (במצב יצירה)
   useEffect(() => {
     if (open) {
-      if (initialValues) {
-        // השתמש ב-setValue כדי להפעיל ולידציה מיידית
-        setValue("name", initialValues.name, { shouldValidate: true });
-        setValue("description", initialValues.description, { shouldValidate: true });
-        setValue("color", initialValues.color, { shouldValidate: true });
-      } else {
-        reset({ name: "", description: "", color: "#FFFFFF" });
-      }
+      reset({
+        name: initialValues?.name ?? "",
+        description: initialValues?.description ?? "",
+        color: initialValues?.color ?? "#FFFFFF",
+      });
     }
   }, [open, initialValues, reset]);
 
   const onSubmit = (data: BoardFormData) => {
     handleSave(data, initialValues?.id);
-    reset();
     onClose();
   };
 
@@ -91,14 +86,13 @@ function BoardFormDialog({
             <Controller
               name="name"
               control={control}
-              rules={{ required: "זהו שדה חובה" }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ field }) => (
                 <TextField
-                  {...field}
+                  {...field} // מעביר אוטומטית value, onChange, onBlur ו-ref
                   label="כותרת"
                   fullWidth
-                  error={!!error}
-                  helperText={error?.message}
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
                 />
               )}
             />
@@ -106,21 +100,34 @@ function BoardFormDialog({
             <Controller
               name="description"
               control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="תיאור"
-                  fullWidth
-                  multiline
-                  rows={3}
-                />
-              )}
+              render={({ field }) => {
+                const maxLength = 200;
+                const currentLength = field.value?.length || 0;
+                return (
+                  <TextField
+                    {...field}
+                    label="תיאור"
+                    fullWidth
+                    multiline
+                    rows={3}
+                    error={!!errors.description}
+                    helperText={
+                      <Box
+                        component="span"
+                        sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
+                      >
+                        <span>{errors.description?.message}</span>
+                        <span>{`${currentLength}/${maxLength}`}</span>
+                      </Box>
+                    }
+                  />
+                );
+              }}
             />
 
             <Controller
               name="color"
               control={control}
-              rules={{ required: "יש לבחור צבע" }}
               render={({ field, fieldState: { error } }) => (
                 <div>
                   <Typography gutterBottom>בחר צבע</Typography>
@@ -161,7 +168,7 @@ function BoardFormDialog({
           <Button onClick={onClose} color="inherit">
             ביטול
           </Button>
-          <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+          <Button type="submit" variant="contained" color="primary">
             {initialValues ? "שמור שינויים" : "צור לוח"}
           </Button>
         </DialogActions>

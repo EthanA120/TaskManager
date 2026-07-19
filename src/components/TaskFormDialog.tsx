@@ -8,6 +8,7 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { Column } from "../types/Column";
 import type { Task } from "../types/Task";
@@ -18,6 +19,7 @@ interface TaskFormDialogProps {
   initialValues?: Task;
   columns: Column[];
   handleSave: (data: Task) => void;
+  selectedColumnId?: string;
 }
 
 function TaskFormDialog({
@@ -26,22 +28,31 @@ function TaskFormDialog({
   handleSave,
   initialValues,
   columns,
+  selectedColumnId,
 }: TaskFormDialogProps) {
   const { control, handleSubmit, reset } = useForm<Task>({
-    defaultValues: initialValues ?? {
-      title: "",
-      description: "",
-      status: "pending",
-      dueDate: new Date(),
-      priority: "medium",
-      column: columns[0]?.id ?? "",
-    },
+    defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    if (open) {
+      reset(
+        initialValues ?? {
+          title: "",
+          description: "",
+          status: "pending",
+          dueDate: new Date(),
+          priority: "medium",
+          column: selectedColumnId ?? columns[0]?.id ?? "",
+        },
+      );
+    }
+  }, [open, initialValues, reset, columns, selectedColumnId]);
 
   const onSubmit = (data: Task) => {
     handleSave(data);
     // איפוס הטופס וסגירה
-    reset();
+    // reset(); // Reset is now handled in useEffect
     onClose();
   };
 
@@ -84,6 +95,7 @@ function TaskFormDialog({
               )}
             />
 
+            {/* הוסף לעמודה */}
             <Controller
               name="column"
               control={control}
@@ -91,6 +103,7 @@ function TaskFormDialog({
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
+                  
                   select
                   label="עמודה"
                   fullWidth

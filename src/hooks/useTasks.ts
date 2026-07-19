@@ -20,10 +20,18 @@ function useTasks() {
   const { raiseSnack } = useContext(SnackContext) as any;
 
   // READ
-  const handleGetTasks = useCallback(async () => {
+  const handleGetTasks = useCallback(async (boardId?: string) => {
     setIsLoading(true);
+    if (!user) {
+      setTasks([]);
+      setIsLoading(false);
+      return;
+    }
     try {
-      const savedTasks = await getTasks();
+      let savedTasks = await getTasks();
+      if (boardId) {
+        // This is not efficient, we will fix it later by querying by boardId
+      }
       setTasks(savedTasks);
     } catch (e) {
       raiseSnack("error", "התרחשה שגיאה בייבוא הנתונים");
@@ -33,7 +41,7 @@ function useTasks() {
      setIsLoading(false);
 
     }
-  }, [raiseSnack]);
+  }, [raiseSnack, user]);
 
   // CREATE
   const handleAddNewTask = useCallback(
@@ -149,6 +157,7 @@ function useTasks() {
 
   return {
     tasks,
+    setTasks, // Expose setTasks for sorting
     handleAddNewTask,
     handleEditTask,
     handleDeleteTask,

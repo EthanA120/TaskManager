@@ -3,4 +3,5 @@ export type Column = {
   name: string;
   board: string;
   color: string;
+  createdAt: number;
 };
