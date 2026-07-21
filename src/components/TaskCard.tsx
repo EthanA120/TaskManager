@@ -9,21 +9,23 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import type { Task } from "../types/Task";
+import { getStatusColor, getHebrewStatus } from "../utils/tasksHelpers";
 import ROUTES from "../router/routes";
-import EditIcon from "@mui/icons-material/Edit";
 import { memo, useContext } from "react";
-import ClearIcon from "@mui/icons-material/Clear";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import { Edit as EditIcon, Clear as ClearIcon, BookmarkAddOutlined as BookmarkAddOutlinedIcon } from "@mui/icons-material";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+
 import {
   ProjectThemeContext,
   type ThemeContextType,
 } from "../providers/ProjectThemeProvider";
 
+import type { User } from "../types/User";
+import type { Task } from "../types/Task";
 
 interface TaskProps {
   task: Task;
+  users: User[];
   handleEditTask: (data: Task) => void;
   handleDeleteTask: (id: string) => void;
   updateLikes: (id: string, action: "inc" | "dec") => void;
@@ -31,6 +33,7 @@ interface TaskProps {
 
 function TaskCard({
   task,
+  users,
   handleEditTask,
   handleDeleteTask,
   updateLikes,
@@ -38,11 +41,19 @@ function TaskCard({
   const navigate = useNavigate();
   const { isDark } = useContext(ProjectThemeContext) as ThemeContextType;
 
+  const taskOwner = users.find((user) => user.id === task.userId);
+  const ownerName = taskOwner?.nickname ?? "לא ידוע";
+
+  const assignee = users.find((user) => user.id === task.assigneeId);
+  const assigneeName = assignee?.nickname;
+
+  // הגדרת אורך מקסימלי משוער ל-3 שורות
+  const isLongDescription = task.description && task.description.length > 95;
 
   return (
     <Card
       sx={{
-        minHeight: 200,
+        minHeight: 250,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -54,52 +65,119 @@ function TaskCard({
         onClick={() => {
           navigate(ROUTES.TASK_PAGE + task.id);
         }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch", // מבטיח פריסה נכונה של ה-ActionArea
+        }}
       >
         <CardContent>
-          <Typography variant="h6" component="h2" gutterBottom>
+          {/* Title */}
+          <Typography variant="h6" component="h2" gutterBottom sx={{ textAlign: 'right' }}>
             {task.title}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {task.description}
-          </Typography>
+
+          {/* תוכן הכרטיס - מוגבל בגובה עם 3 נקודות בסוף */}
+          <Box sx={{ height: 85, overflow: 'hidden', position: 'relative', mb: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                textAlign: 'right',
+                display: '-webkit-box',
+                WebkitLineClamp: 3, // מגביל את הטקסט ל-3 שורות
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {task.description}
+            </Typography>
+
+            {/* הלינק יופיע רק אם התיאור באמת ארוך מספיק כדי להיחתך */}
+            {isLongDescription && (
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  textAlign: 'right',
+                  mt: 0.5,
+                  color: isDark ? "#90caf9" : "#1976d2",
+                  fontWeight: 'bold'
+                }}
+              >
+                המשך לקרוא...
+              </Typography>
+            )}
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.secondary" }}>
+              <CalendarTodayIcon sx={{ fontSize: "1rem" }} />
+              <Typography variant="caption">
+                {task.dueDate instanceof Date
+                  ? task.dueDate.toLocaleDateString("he-IL")
+                  : "אין תאריך"}
+              </Typography>
+            </Box>
+
+            {assigneeName && (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right', dir: "rtl" }}>
+                אחראי: {assigneeName}
+              </Typography>
+            )}
+          </Box>
+
+          <Box sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRight: "1px solid #ccc",
+            mt: 2,
+            p: 1,
+          }}>
+
+            {ownerName && (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right', dir: "rtl" }}>
+                יוצר המשימה: {ownerName}
+              </Typography>
+            )}
+            <Chip
+              label={getHebrewStatus(task.status)}
+              color={getStatusColor(task.status)}
+              variant="filled"
+              sx={{
+                textTransform: "capitalize",
+                alignSelf: "flex-end" // מיישר את הצ'יפ לימין בהתאם לשפה
+              }}
+            />
+          </Box>
         </CardContent>
-        <Box sx={{ p: 2, pt: 0 }}>
-          <Chip
-            label={task.status}
-            color={task.status === "completed" ? "success" : "warning"}
-            variant="filled"
-            sx={{ textTransform: "capitalize" }}
-          />
-        </Box>
       </CardActionArea>
-      <CardActions disableSpacing>
+
+      {/* אזור הפעולות - ה-onClick עבר ל-IconButton המרכזי כדי למנוע פספוס לחיצות */}
+      <CardActions disableSpacing sx={{
+        justifyContent: "flex-start",
+      }}>
         <IconButton onClick={() => handleEditTask(task)} aria-label="Edit task">
           <EditIcon />
         </IconButton>
-        <IconButton>
-          <ClearIcon
-            sx={{ color: "red" }}
-            onClick={() => handleDeleteTask(task.id)}
-            aria-label="Delete task"
-          />
+        <IconButton onClick={() => handleDeleteTask(task.id)} aria-label="Delete task">
+          <ClearIcon sx={{ color: "red" }} />
         </IconButton>
-        <IconButton>
-          <ThumbUpIcon
-            sx={{ color: isDark ? "#90caf9" : "#1976d2" }}
-            onClick={() => updateLikes(task.id, "inc")}
-            aria-label="Like"
-          />
+        <IconButton onClick={() => updateLikes(task.id, "inc")} aria-label="Like">
+          <BookmarkAddOutlinedIcon sx={{ color: isDark ? "#90caf9" : "#1976d2" }} />
         </IconButton>
-        <IconButton>
-          <ThumbDownIcon
-            sx={{ color: isDark ? "#f48fb1" : "#d32f2f" }}
-            onClick={() => updateLikes(task.id, "dec")}
-            aria-label="DisLike"
-          />
-        </IconButton>
-        <Typography>{task.likes}</Typography>
+        <Typography sx={{ ml: 1, fontWeight: "bold" }}>{task.likes}</Typography>
       </CardActions>
     </Card>
   );
 }
+
 export default memo(TaskCard);

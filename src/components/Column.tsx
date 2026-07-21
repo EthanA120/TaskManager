@@ -1,17 +1,20 @@
-import { Box, IconButton, Paper, Typography, Menu, MenuItem } from "@mui/material";
-import { AddBox as AddBoxIcon, Edit as EditIcon, Clear as ClearIcon, Sort as SortIcon } from "@mui/icons-material";
+import { Box, IconButton, Paper, Typography, Menu, MenuItem, Popover } from "@mui/material";
+import { AddBox as AddBoxIcon, Edit as EditIcon, Clear as ClearIcon, Sort as SortIcon, Palette as PaletteIcon } from "@mui/icons-material";
 import { useDroppable } from "@dnd-kit/react";
 import { memo, useState } from "react";
 import type { Column as ColumnType } from "../types/Column";
 import type { Task } from "../types/Task";
 import { type TaskSortOption } from "../pages/BoardPage";
+import cardsColors from "../utils/cardColors";
+import type { User } from "../types/User";
 import DraggableTaskCard from "./DraggableTaskCard";
 
 interface ColumnProps {
   column: ColumnType;
   tasks: Task[];
+  users: User[];
   columns: ColumnType[];
-  onAddingTask: (column: ColumnType) => void;  onSortingTask: (sortBy: TaskSortOption, columnId: string) => void;
+  onAddingTask: (column: ColumnType) => void; onSortingTask: (sortBy: TaskSortOption, columnId: string) => void;
   onEditColumn: (column: ColumnType) => void;
   onDeleteColumn: (id: string) => void;
   handleEditTask: (data: Task) => void;
@@ -22,7 +25,7 @@ interface ColumnProps {
 function Column({
   column,
   tasks,
-  columns,
+  users,
   onAddingTask,
   onSortingTask,
   onEditColumn,
@@ -38,6 +41,9 @@ function Column({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  const [colorAnchorEl, setColorAnchorEl] = useState<null | HTMLElement>(null);
+  const isColorPickerOpen = Boolean(colorAnchorEl);
+
   const handleClickSort = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -51,36 +57,50 @@ function Column({
     handleCloseSort();
   };
 
+  const handleOpenColorPicker = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setColorAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseColorPicker = () => {
+    setColorAnchorEl(null);
+  };
+
+  const handleColorSelect = (color: string) => {
+    onEditColumn({ ...column, color });
+    handleCloseColorPicker();
+  };
+
   return (
     <Paper
       elevation={2}
       sx={{
         minWidth: 280,
-        maxWidth: "100%",
-        flexShrink: 0,
+        p: 1.5,
         display: "flex",
         flexDirection: "column",
         bgcolor: isDropTarget ? "action.hover" : column.color,
         transition: "background-color 0.2s",
       }}
     >
-      {/* פקודות עמודה */}
+
       <Box
         sx={{
           minWidth: 280,
-          maxWidth: "20vw",
+          // maxWidth: "fit-content",
           p: 1.5,
           borderBottom: 1,
           borderColor: "divider",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          gap: 4,
         }}
       >
+        {/* פקודות עמודה */}
         <Typography variant="h5" component="h2" noWrap>
           {column.name}
         </Typography>
-        <Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <IconButton
             size="small"
             onClick={handleClickSort}
@@ -106,7 +126,7 @@ function Column({
               מיין לפי סטטוס
             </MenuItem>
           </Menu>
-          
+
           <IconButton
             size="small"
             onClick={() => onAddingTask(column)}
@@ -114,6 +134,45 @@ function Column({
           >
             <AddBoxIcon fontSize="small" />
           </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={handleOpenColorPicker}
+            aria-label="שינוי צבע"
+          >
+            <PaletteIcon fontSize="small" />
+          </IconButton>
+          <Popover
+            open={isColorPickerOpen}
+            anchorEl={colorAnchorEl}
+            onClose={handleCloseColorPicker}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+            <Box sx={{ p: 1, display: 'flex', gap: 1 }}>
+              {cardsColors.map((color) => (
+                <Box
+                  key={color}
+                  onClick={() => handleColorSelect(color)}
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    backgroundColor: color,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    border: column.color === color ? '2px solid' : '1px solid',
+                    borderColor: column.color === color ? 'primary.main' : 'divider',
+                  }}
+                />
+              ))}
+            </Box>
+          </Popover>
 
           <IconButton
             size="small"
@@ -139,10 +198,11 @@ function Column({
         sx={{
           p: 1.5,
           flex: 1,
-          minHeight: 200,
-          overflowX: "scroll",
-          display: "flex",
+          display: "grid",
+          // יוצר רשת עם עמודות ברוחב קבוע של 300px
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: 1.5,
+          minHeight: 200, // גובה מינימלי כדי שהאזור יגיב לגרירה גם כשהוא ריק
         }}
       >
         {tasks.length > 0 ? (
@@ -150,7 +210,7 @@ function Column({
             <DraggableTaskCard
               key={task.id}
               task={task}
-              columns={columns}
+              users={users}
               handleEditTask={handleEditTask}
               handleDeleteTask={handleDeleteTask}
               updateLikes={updateLikes}

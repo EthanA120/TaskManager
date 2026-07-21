@@ -2,13 +2,13 @@ import { Box, IconButton } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { useDraggable } from "@dnd-kit/react";
 import { memo } from "react";
-import type { Column } from "../types/Column";
+import type { User } from "../types/User";
 import type { Task } from "../types/Task";
 import TaskCard from "./TaskCard";
 
 interface DraggableTaskCardProps {
   task: Task;
-  columns: Column[];
+  users: User[];
   handleEditTask: (data: Task) => void;
   handleDeleteTask: (id: string) => void;
   updateLikes: (id: string, action: "inc" | "dec") => void;
@@ -16,7 +16,7 @@ interface DraggableTaskCardProps {
 
 function DraggableTaskCard({
   task,
-  columns,
+  users,
   handleEditTask,
   handleDeleteTask,
   updateLikes,
@@ -47,7 +47,7 @@ function DraggableTaskCard({
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <TaskCard
           task={task}
-          columns={columns}
+          users={users}
           handleEditTask={handleEditTask}
           handleDeleteTask={handleDeleteTask}
           updateLikes={updateLikes}

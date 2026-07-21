@@ -67,7 +67,10 @@ function ColumnFormDialog({
         handleSave({ ...initialValues, ...data });
       } else {
         // When creating a new column, include required fields from Column type
-        handleSave({ ...data, createdAt: Number(new Date().toISOString()) });
+        handleSave({
+          ...data,
+          createdAt: Date.now(),
+        });
       }
       onClose();
     };

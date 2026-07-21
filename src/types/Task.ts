@@ -4,6 +4,7 @@ export type Task = {
   title: string;
   description: string;
   userId: string | null;
+  assigneeId: string | null;
   savedBy: string[];
   status: "completed" | "pending" | "in-progress";
   dueDate: Date;

@@ -12,6 +12,7 @@ import { SnackContext } from "../providers/SnackProvider";
 import type { Column } from "../types/Column";
 import CircularProgress from "@mui/material/CircularProgress";
 import useBoards from "../hooks/useBoards";
+import useUsers from "../hooks/useUsers";
 import ROUTES from "../router/routes";
 
 export type TaskSortOption = "title" | "dueDate" | "priority" | "status";
@@ -29,6 +30,7 @@ function BoardPage() {
 
   const { boardId } = useParams<{ boardId: string }>();
   const { boards, handleGetBoards: handleGetBoardsList } = useBoards();
+  const { users, handleGetUsers } = useUsers();
   const board = boards.find((b) => b.id === boardId);
 
   const { raiseSnack } = useContext(SnackContext) as {
@@ -66,9 +68,10 @@ function BoardPage() {
 
   useEffect(() => {
     handleGetBoardsList();
+    handleGetUsers();
     handleGetTasks(boardId);
     handleGetColumns(boardId);
-  }, [handleGetTasks, handleGetColumns, handleGetBoardsList, boardId]);
+  }, [handleGetTasks, handleGetColumns, handleGetBoardsList, handleGetUsers, boardId]);
 
   const handleOpenAddTask = (column?: Column) => {
     if (columns.length === 0) {
@@ -252,6 +255,7 @@ function BoardPage() {
           <KanbanBoard
             columns={columns}
             tasks={tasks}
+            users={users}
             columnIds={columnIds}
             onMoveTask={moveTaskToColumn}
             onAddingTask={handleOpenAddTask}
@@ -312,6 +316,7 @@ function BoardPage() {
           <TaskFormDialog
             open={isTaskDialogOpen}
             onClose={() => setIsTaskDialogOpen(false)}
+            users={users}
             columns={columns}
             handleSave={handleTaskSave}
             initialValues={editingTask}

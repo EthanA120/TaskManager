@@ -13,7 +13,7 @@ export const getStatusColor = (status: Task["status"]) => {
     case "in-progress":
       return "warning";
     default:
-      return "default";
+      return "secondary";
   }
 };
 
@@ -28,5 +28,31 @@ export const getPriorityColor = (priority: Task["priority"]) => {
 
     default:
       return "default";
+  }
+};
+
+export const getHebrewStatus = (status: Task["status"]) => {
+  switch (status) {
+    case "completed":
+      return "הושלם";
+    case "in-progress":
+      return "בתהליך";
+    case "pending":
+      return "ממתין";
+    default:
+      return status;
+  }
+};
+
+export const getHebrewPriority = (priority: Task["priority"]) => {
+  switch (priority) {
+    case "high":
+      return "גבוהה";
+    case "medium":
+      return "בינונית";
+    case "low":
+      return "נמוכה";
+    default:
+      return priority;
   }
 };

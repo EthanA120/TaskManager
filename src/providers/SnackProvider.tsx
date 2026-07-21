@@ -1,5 +1,5 @@
 import { createContext, useCallback, useState, type ReactNode } from "react";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, Typography } from "@mui/material";
 
 const SnackContext = createContext({});
 
@@ -51,7 +51,9 @@ function SnackProvider({ children }: { children: ReactNode }) {
             setOpenSnack(false);
           }}
         >
-          {snackMessage}
+          <Typography variant="body2" dir="rtl">
+            {snackMessage}
+          </Typography>
         </Alert>
       </Snackbar>
     </>

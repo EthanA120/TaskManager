@@ -11,11 +11,13 @@ import {
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { Column } from "../types/Column";
+import type { User } from "../types/User";
 import type { Task } from "../types/Task";
 
 interface TaskFormDialogProps {
   open: boolean;
   onClose: () => void;
+  users: User[];
   initialValues?: Task;
   columns: Column[];
   handleSave: (data: Task) => void;
@@ -25,6 +27,7 @@ interface TaskFormDialogProps {
 function TaskFormDialog({
   open,
   onClose,
+  users,
   handleSave,
   initialValues,
   columns,
@@ -44,6 +47,7 @@ function TaskFormDialog({
           dueDate: new Date(),
           priority: "medium",
           column: selectedColumnId ?? columns[0]?.id ?? "",
+          assigneeId: null,
         },
       );
     }
@@ -119,6 +123,26 @@ function TaskFormDialog({
               )}
             />
 
+            {/* אחראי על המשימה */}
+            <Controller
+              name="assigneeId"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="אחראי"
+                  fullWidth
+                  value={field.value || ""} // Handle null value for select
+                >
+                  <MenuItem value=""><em>ללא</em></MenuItem>
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>{user.nickname}</MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+
             <Stack direction="row" spacing={2}>
               {/* סטטוס */}
               <Controller
@@ -126,9 +150,9 @@ function TaskFormDialog({
                 control={control}
                 render={({ field }) => (
                   <TextField {...field} select label="סטטוס" fullWidth>
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="in-progress">In Progress</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
+                    <MenuItem value="pending">ממתין</MenuItem>
+                    <MenuItem value="in-progress">בתהליך</MenuItem>
+                    <MenuItem value="completed">הושלם</MenuItem>
                   </TextField>
                 )}
               />
@@ -139,9 +163,9 @@ function TaskFormDialog({
                 control={control}
                 render={({ field }) => (
                   <TextField {...field} select label="עדיפות" fullWidth>
-                    <MenuItem value="low">Low</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="high">High</MenuItem>
+                    <MenuItem value="low">נמוכה</MenuItem>
+                    <MenuItem value="medium">בינונית</MenuItem>
+                    <MenuItem value="high">גבוהה</MenuItem>
                   </TextField>
                 )}
               />

@@ -4,11 +4,13 @@ import { memo } from "react";
 import type { Column as ColumnType } from "../types/Column";
 import type { Task } from "../types/Task";
 import { type TaskSortOption } from "../pages/BoardPage";
+import type { User } from "../types/User";
 import Column from "./Column";
 
 interface KanbanBoardProps {
   columns: ColumnType[];
   tasks: Task[];
+  users: User[];
   columnIds: Set<string>;
   onMoveTask: (taskId: string, columnId: string) => void;
   onAddingTask: (column: ColumnType) => void;  onSortingTask: (sortBy: TaskSortOption, columnId: string) => void;
@@ -22,6 +24,7 @@ interface KanbanBoardProps {
 function KanbanBoard({
   columns,
   tasks,
+  users,
   columnIds,
   onMoveTask,
   onAddingTask,
@@ -58,8 +61,7 @@ function KanbanBoard({
           gap: 2,
           overflowX: "auto",
           pb: 2,
-          alignItems: "flex-start",
-          direction: "rtl",
+          direction: "rtl", // alignItems: "stretch" is the default and will make columns take full width
         }}
       >
         {columns.map((column) => (
@@ -67,6 +69,7 @@ function KanbanBoard({
             key={column.id}
             column={column}
             tasks={tasks.filter((t) => t.column === column.id)}
+            users={users}
             columns={columns}
             onAddingTask={onAddingTask}
             onSortingTask={onSortingTask}
