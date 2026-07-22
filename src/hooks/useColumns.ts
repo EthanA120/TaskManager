@@ -13,7 +13,9 @@ import { auth } from "../config/firebase";
 
 function useColumns() {
 	const [columns, setColumns] = useState<Column[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 	const [user] = useAuthState(auth);
+  
 
 	const { raiseSnack } = useContext(SnackContext) as {
 		raiseSnack: (
@@ -24,8 +26,10 @@ function useColumns() {
 
 	// READ
 	const handleGetColumns = useCallback(async (boardId?: string) => {
+		setIsLoading(true);
 		if (!user) {
 			setColumns([]);
+			setIsLoading(false);
 			return;
 		}
 
@@ -37,8 +41,10 @@ function useColumns() {
 			setColumns(savedColumns.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0)));
 		} catch {
 			raiseSnack("error", "התרחשה שגיאה בייבוא הנתונים");
+		} finally {
+			setIsLoading(false);
 		}
-	}, [raiseSnack, setColumns, user]);
+	}, [raiseSnack, user]);
 
 	// CREATE
 	const handleAddColumn = useCallback(
@@ -110,6 +116,7 @@ function useColumns() {
 
 	return {
 		columns,
+		isLoading,
 		handleGetColumns,
 		handleAddColumn,
 		handleEditColumn,

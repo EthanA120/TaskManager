@@ -6,6 +6,7 @@ const ROUTES = {
   TASK_PAGE: "/task/",
   LOGIN: "/login",
   REGISTER: "/register",
+  PROFILE: "/profile"
 };
 
 export default ROUTES;

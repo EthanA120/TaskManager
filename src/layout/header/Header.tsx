@@ -98,7 +98,7 @@ function Header() {
               onClick={handleOpenUserMenu}
               color="inherit"
             >
-              <AccountCircle />
+              {user ? <AccountCircle /> : <Login />}
             </IconButton>
             <Menu
               id="menu-appbar-user"
@@ -118,17 +118,17 @@ function Header() {
               {user ? (
                 [
                   <CostumeMenuItem
-                  key="profile"
-                  navigate={() => navigate(ROUTES.HOME)}
-                  handleFunction={() => handleCloseUserMenu()}
-                  icon={() => <ManageAccountsOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
-                  text={user.nickname} />,
+                    key="profile"
+                    navigate={() => navigate(ROUTES.PROFILE)}
+                    handleFunction={() => handleCloseUserMenu()}
+                    icon={() => <ManageAccountsOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                    text={user.nickname} id={""} />,
                   <CostumeMenuItem
-                  key="logout"
-                  navigate={() => logout()}
-                  handleFunction={() => handleCloseUserMenu()}
-                  icon={() => <Logout sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
-                  text="יציאה" />
+                    key="logout"
+                    navigate={() => logout()}
+                    handleFunction={() => handleCloseUserMenu()}
+                    icon={() => <Logout sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
+                    text="יציאה" id={""} />
                 ]
               ) : (
                 [
@@ -137,15 +137,13 @@ function Header() {
                     navigate={() => navigate(ROUTES.LOGIN)}
                     handleFunction={() => handleCloseUserMenu()}
                     icon={() => <Login sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
-                    text="כניסה"
-                  />,
+                    text="כניסה" id={""}                  />,
                   <CostumeMenuItem
                     key="register"
                     navigate={() => navigate(ROUTES.REGISTER)}
                     handleFunction={() => handleCloseUserMenu()}
                     icon={() => <PersonAddOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
-                    text="הרשמה"
-                  />
+                    text="הרשמה" id={""}                  />
                 ]
               )}
             </Menu>

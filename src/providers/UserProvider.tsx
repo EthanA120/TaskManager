@@ -46,9 +46,7 @@ function UserProvider({ children }: { children: ReactNode }) {
     [auth],
   );
   const logout = useCallback(async () => {
-    await signOut(auth);
-    setUser(null);
-    window.location.href = "/login";
+    signOut(auth);
   }, [auth]);
 
   useEffect(() => {

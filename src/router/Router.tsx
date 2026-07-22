@@ -9,6 +9,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import PageNotFound from "../pages/PageNotFound";
 import ProtectedRoute from "./ProtectedRoute";
+import ProfilePage from "../pages/ProfilePage";
 
 function Router() {
   return (
@@ -23,6 +24,10 @@ function Router() {
       <Route
         path={ROUTES.HOME}
         element={<ProtectedRoute navigate={ROUTES.ABOUT}><HomePage /></ProtectedRoute>}
+      />
+      <Route
+        path={ROUTES.PROFILE}
+        element={<ProtectedRoute navigate={ROUTES.LOGIN}><ProfilePage /></ProtectedRoute>}
       />
       <Route
         path={ROUTES.BOARD_PAGE + ":boardId"}
