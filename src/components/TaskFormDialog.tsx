@@ -61,8 +61,8 @@ function TaskFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>
+    <Dialog dir="rtl" open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle color="primary">
         {initialValues ? "עריכת משימה" : "הוספת משימה חדשה"}
       </DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -80,6 +80,9 @@ function TaskFormDialog({
                   fullWidth
                   error={!!error}
                   helperText={error?.message}
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                 />
               )}
             />
@@ -95,6 +98,9 @@ function TaskFormDialog({
                   fullWidth
                   multiline
                   rows={3}
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                 />
               )}
             />
@@ -107,12 +113,15 @@ function TaskFormDialog({
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
-                  
+
                   select
                   label="עמודה"
                   fullWidth
                   error={!!error}
                   helperText={error?.message}
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                 >
                   {columns.map((col) => (
                     <MenuItem key={col.id} value={col.id}>
@@ -133,6 +142,9 @@ function TaskFormDialog({
                   select
                   label="אחראי"
                   fullWidth
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                   value={field.value || ""} // Handle null value for select
                 >
                   <MenuItem value=""><em>ללא</em></MenuItem>
@@ -149,7 +161,16 @@ function TaskFormDialog({
                 name="status"
                 control={control}
                 render={({ field }) => (
-                  <TextField {...field} select label="סטטוס" fullWidth>
+                  <TextField
+                    {...field}
+                    select
+                    label="סטטוס"
+                    fullWidth
+                    dir="rtl"
+                    slotProps={{
+                      inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                    }}
+                  >
                     <MenuItem value="pending">ממתין</MenuItem>
                     <MenuItem value="in-progress">בתהליך</MenuItem>
                     <MenuItem value="completed">הושלם</MenuItem>
@@ -162,7 +183,16 @@ function TaskFormDialog({
                 name="priority"
                 control={control}
                 render={({ field }) => (
-                  <TextField {...field} select label="עדיפות" fullWidth>
+                  <TextField
+                    {...field}
+                    select
+                    label="עדיפות"
+                    fullWidth
+                    dir="rtl"
+                    slotProps={{
+                      inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                    }}
+                  >
                     <MenuItem value="low">נמוכה</MenuItem>
                     <MenuItem value="medium">בינונית</MenuItem>
                     <MenuItem value="high">גבוהה</MenuItem>
@@ -181,6 +211,9 @@ function TaskFormDialog({
                   label="תאריך יעד"
                   type="date"
                   fullWidth
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                   onChange={(e) => field.onChange(new Date(e.target.value))}
                   value={
                     field.value instanceof Date

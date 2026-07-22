@@ -8,11 +8,18 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Alert,
+  AlertTitle,
+  Link,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import { useUser } from "../providers/UserProvider";
+import { Link as RouterLink } from "react-router-dom";
+import ROUTES from "../router/routes";
 
 const AboutPage: React.FC = () => {
+  const { user } = useUser();
   const features = [
     "ניהול ומעקב אחר משימות בצורה חכמה",
     "הגדרת סדרי עדיפויות ולוחות זמנים",
@@ -33,11 +40,11 @@ const AboutPage: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            <TaskAltIcon sx={{color: "primary.glow", fontSize: 40, ml: 2 }} />
+            <TaskAltIcon sx={{ color: "primary.glow", fontSize: 40, ml: 2 }} />
             <Typography
               variant="h4"
               component="h1"
-              sx={{color: "primary.glow", typography: { xs: "h5", md: "h4" } }}
+              sx={{ color: "primary.glow", typography: { xs: "h5", md: "h4" } }}
             >
               אודות המערכת שלנו
             </Typography>
@@ -57,27 +64,42 @@ const AboutPage: React.FC = () => {
             </Typography>
           </Box>
 
+          {/* קטע למשתמשים לא מחוברים */}
+          {!user && (
+            <Alert severity="info" sx={{ mt: 4, p: 2, borderRadius: 2 }}>
+              <AlertTitle sx={{ fontWeight: "bold", mr: 1 }}>רוצה להתחיל לנהל משימות?</AlertTitle>
+              כדי להשתמש במערכת, יש{" "}
+              <Link component={RouterLink} to={ROUTES.LOGIN} sx={{ fontWeight: "bold" }}>
+                להתחבר
+              </Link>{" "}
+              או{" "}
+              <Link component={RouterLink} to={ROUTES.REGISTER} sx={{ fontWeight: "bold" }}>
+                להירשם
+              </Link>
+              .
+            </Alert>
+          )}
+
           {/* רשימת יתרונות */}
-          <Box
-            sx={{ mt: 4, bgcolor: "action.hover", p: 3, borderRadius: 2 }}
-          >
-            <Typography variant="h6" component="h2" gutterBottom>
+          <Alert variant="outlined" severity="success" sx={{ mt: 4, p: 2, borderRadius: 2 }}>
+            <AlertTitle sx={{ fontWeight: "bold", mr: 1 }}>
               מה אנחנו מציעים?
-            </Typography>
+            </AlertTitle>
             <List>
               {features.map((feature, index) => (
                 <ListItem key={index} disablePadding sx={{ mb: 1, display: 'flex' }}>
-                  <ListItemIcon sx={{ minWidth: 40, alignItems: "center"}}>
+                  <ListItemIcon sx={{ minWidth: 40, alignItems: "center" }}>
                     <CheckCircleIcon color="success" />
-                  <ListItemText primary={feature} sx={{ mr: 2, textAlign: "right" }} />
+                    <ListItemText primary={feature} sx={{ mr: 2, textAlign: "right" }} />
                   </ListItemIcon>
                 </ListItem>
               ))}
             </List>
-          </Box>
+          </Alert>
+
         </Paper>
       </Box>
-    </Container>
+    </Container >
   );
 };
 

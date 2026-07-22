@@ -192,6 +192,7 @@ function HomePage() {
         anchorEl={anchorEl}
         open={isColorMenuOpen}
         onClose={() => setAnchorEl(null)}
+        dir="rtl"
         slotProps={{
           list: {
             sx: {

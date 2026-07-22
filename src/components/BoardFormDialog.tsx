@@ -74,8 +74,8 @@ function BoardFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>
+    <Dialog dir="rtl" open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle color="primary">
         {initialValues ? "עריכת לוח" : "הוספת לוח חדש"}
       </DialogTitle>
 
@@ -93,6 +93,9 @@ function BoardFormDialog({
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                 />
               )}
             />
@@ -111,6 +114,9 @@ function BoardFormDialog({
                     multiline
                     rows={3}
                     error={!!errors.description}
+                    slotProps={{
+                      inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                    }}
                     helperText={
                       <Box
                         component="span"
@@ -130,7 +136,7 @@ function BoardFormDialog({
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <div>
-                  <Typography gutterBottom>בחר צבע</Typography>
+                  <Typography gutterBottom dir="rtl">בחר צבע</Typography>
                   <Box sx={{ display: "flex", gap: 1 }}>
                     {boardColors.map(
                       (color) => (

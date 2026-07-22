@@ -69,7 +69,7 @@ function BoardPage() {
   useEffect(() => {
     handleGetBoardsList();
     handleGetUsers();
-    handleGetTasks(boardId);
+    handleGetTasks();
     handleGetColumns(boardId);
   }, [handleGetTasks, handleGetColumns, handleGetBoardsList, handleGetUsers, boardId]);
 

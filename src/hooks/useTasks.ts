@@ -23,7 +23,7 @@ function useTasks() {
 
 	// READ
 	const handleGetTasks = useCallback(
-		async (boardId?: string) => {
+		async () => {
 			setIsLoading(true);
 			if (!user) {
 				setTasks([]);
@@ -32,9 +32,7 @@ function useTasks() {
 			}
 			try {
 				let savedTasks = await getTasks();
-				if (boardId) {
-					// This is not efficient, we will fix it later by querying by boardId
-				}
+				// No filtering is needed here as getTasks fetches all tasks.
 				// Convert Firestore Timestamps to JS Date objects
 				savedTasks = savedTasks.map((task) => {
 					if ((task.dueDate as any)?.seconds) {

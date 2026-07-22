@@ -155,7 +155,7 @@ function Column({
               horizontal: 'center',
             }}
           >
-            <Box sx={{ p: 1, display: 'flex', gap: 1 }}>
+            <Box dir="rtl" sx={{ p: 1, display: 'flex', gap: 1 }}>
               {cardsColors.map((color) => (
                 <Box
                   key={color}

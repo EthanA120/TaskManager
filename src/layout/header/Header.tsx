@@ -98,7 +98,8 @@ function Header() {
               onClick={handleOpenUserMenu}
               color="inherit"
             >
-              {user ? <AccountCircle /> : <Login />}
+              <AccountCircle />
+              <Typography sx={{ mr: 0.5 }}>{user ? user?.nickname : ""}</Typography>
             </IconButton>
             <Menu
               id="menu-appbar-user"
@@ -122,7 +123,7 @@ function Header() {
                     navigate={() => navigate(ROUTES.PROFILE)}
                     handleFunction={() => handleCloseUserMenu()}
                     icon={() => <ManageAccountsOutlined sx={{ color: "primary.main", verticalAlign: "middle", marginRight: 1 }} />}
-                    text={user.nickname} id={""} />,
+                    text={"איזור אישי"} id={""} />,
                   <CostumeMenuItem
                     key="logout"
                     navigate={() => logout()}

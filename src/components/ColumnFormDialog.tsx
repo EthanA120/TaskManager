@@ -49,35 +49,35 @@ function ColumnFormDialog({
     control, handleSubmit, reset, formState: { errors }
   } = useForm<ColumnFormData>({
     resolver: joiResolver(columnSchema), // חיבור הסכימה ל-React Hook Form
-        mode: 'onTouched', // ולידציה תתבצע ברגע שהמשתמש יוצא מהשדה
-        defaultValues: { name: "", color: "#FFFFFF" },
+    mode: 'onTouched', // ולידציה תתבצע ברגע שהמשתמש יוצא מהשדה
+    defaultValues: { name: "", color: "#FFFFFF" },
   });
 
   useEffect(() => {
-      if (open) {
-        reset({
-          name: initialValues?.name ?? "",
-          color: initialValues?.color ?? "#FFFFFF",
-        });
-      }
-    }, [open, initialValues, reset]);
-  
-    const onSubmit = (data: ColumnFormData) => {
-      if (initialValues) {
-        handleSave({ ...initialValues, ...data });
-      } else {
-        // When creating a new column, include required fields from Column type
-        handleSave({
-          ...data,
-          createdAt: Date.now(),
-        });
-      }
-      onClose();
-    };
+    if (open) {
+      reset({
+        name: initialValues?.name ?? "",
+        color: initialValues?.color ?? "#FFFFFF",
+      });
+    }
+  }, [open, initialValues, reset]);
+
+  const onSubmit = (data: ColumnFormData) => {
+    if (initialValues) {
+      handleSave({ ...initialValues, ...data });
+    } else {
+      // When creating a new column, include required fields from Column type
+      handleSave({
+        ...data,
+        createdAt: Date.now(),
+      });
+    }
+    onClose();
+  };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>
+    <Dialog dir="rtl" open={open} onClose={onClose} fullWidth maxWidth="xs">
+      <DialogTitle color="primary">
         {initialValues ? "עריכת עמודה" : "הוספת עמודה חדשה"}
       </DialogTitle>
 
@@ -94,6 +94,9 @@ function ColumnFormDialog({
                   fullWidth
                   error={!!error}
                   helperText={errors.name?.message}
+                  slotProps={{
+                    inputLabel: { sx: { transformOrigin: "top right", right: 28, left: "auto" } }
+                  }}
                 />
               )}
             />
