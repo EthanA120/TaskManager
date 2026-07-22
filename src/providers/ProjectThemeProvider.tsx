@@ -42,7 +42,7 @@ const darkPalette = {
   },
   text: {
     primary: "#e2e8f0", // Slate 200
-    secondary: "#94a3b8", // Slate 400
+    secondary: "#b5bac1", // Slate 400
   },
 };
 

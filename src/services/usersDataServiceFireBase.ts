@@ -1,4 +1,4 @@
-import { getFirestore, collection, setDoc, getDocs, getDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, setDoc, getDocs, getDoc, doc, updateDoc } from "firebase/firestore";
 import app from "../config/firebase";
 import {type User } from "../types/User";
 
@@ -16,6 +16,19 @@ export async function getUsers(): Promise<User[]> {
     }));
   } catch (error) {
     console.error("Error getting users:", error);
+    throw error;
+  }
+}
+
+export async function updateUser(
+  id: string,
+  updatedData: Partial<User>,
+): Promise<void> {
+  try {
+    const userDocRef = doc(db, "users", id);
+    await updateDoc(userDocRef, updatedData);
+  } catch (error) {
+    console.error("Error updating user: ", error);
     throw error;
   }
 }

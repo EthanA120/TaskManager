@@ -7,6 +7,7 @@ import {
 	updateTask,
 	deleteTask,
 } from "../services/tasksDataServiceFireBase"; // ודא שהנתיב תקין
+import { updateUser } from "../services/usersDataServiceFireBase";
 import { useAuthState } from "react-firebase-hooks/auth"; // ייבוא של ה-hook
 import { getUserById } from "../services/usersDataServiceFireBase";
 import { auth } from "../config/firebase"; // ייבוא של אובייקט ה-auth
@@ -35,7 +36,7 @@ function useTasks() {
 					// This is not efficient, we will fix it later by querying by boardId
 				}
 				// Convert Firestore Timestamps to JS Date objects
-				savedTasks = savedTasks.map(task => {
+				savedTasks = savedTasks.map((task) => {
 					if ((task.dueDate as any)?.seconds) {
 						task.dueDate = new Date((task.dueDate as any).seconds * 1000);
 					}
@@ -128,7 +129,9 @@ function useTasks() {
 					assigneeId: task.assigneeId || null,
 				};
 				await updateTask(task.id, taskToSave);
-				setTasks((prev) => prev.map((t) => (t.id === task.id ? taskToSave : t)));
+				setTasks((prev) =>
+					prev.map((t) => (t.id === task.id ? taskToSave : t)),
+				);
 				raiseSnack("success", "משימה נערכה בהצלחה");
 			} catch (error) {
 				raiseSnack("error", "שגיאה בעריכת המשימה");
@@ -178,23 +181,50 @@ function useTasks() {
 
 	// UPDATE - Likes (Optimistic Update)
 	const updateLikes = useCallback(
-		(id: string, action: "inc" | "dec") => {
-			setTasks((prev) => {
-				const task = prev.find((t) => t.id === id);
-				if (!task) return prev;
+		(taskId: string) => {
+			if (!user) {
+				raiseSnack("warning", "יש להתחבר כדי לשמור משימה");
+				return;
+			}
 
-				const newLikes = action === "inc" ? task.likes + 1 : task.likes - 1;
+			setTasks((prevTasks) => {
+				const taskIndex = prevTasks.findIndex((t) => t.id === taskId);
+				if (taskIndex === -1) return prevTasks;
 
-				// עדכון פיירבייס ברקע
-				updateTask(id, { likes: newLikes }).catch(() => {
-					raiseSnack("error", "שגיאה בעדכון הלייקים");
-				});
+				const originalTask = prevTasks[taskIndex];
+				const isSaved = originalTask.savedBy?.includes(user.uid);
 
-				// עדכון UI מידי
-				return prev.map((t) => (t.id === id ? { ...t, likes: newLikes } : t));
+				// Toggle saved status
+				const newSavedBy = isSaved
+					? originalTask.savedBy.filter((uid) => uid !== user.uid)
+					: [...(originalTask.savedBy || []), user.uid];
+
+				const newLikes = newSavedBy.length;
+
+				const updatedTask = {
+					...originalTask,
+					savedBy: newSavedBy,
+					likes: newLikes,
+				};
+
+				// Optimistic UI update
+				const newTasks = [...prevTasks];
+				newTasks[taskIndex] = updatedTask;
+
+				// Update Firebase in the background
+				Promise.all([
+					updateTask(taskId, { savedBy: newSavedBy, likes: newLikes }),
+					updateUser(user.uid, {
+						savedTasks: isSaved
+							? (user as any).savedTasks?.filter((id: string) => id !== taskId) || []
+							: [...((user as any).savedTasks || []), taskId],
+					}),
+				]).catch(() => raiseSnack("error", "שגיאה בעדכון שמירת המשימה"));
+
+				return newTasks;
 			});
 		},
-		[raiseSnack],
+		[user, raiseSnack],
 	);
 
 	return {

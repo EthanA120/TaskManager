@@ -1,5 +1,5 @@
 import { useState, useCallback, useContext } from "react";
-import { getUsers as getUsersFromDb } from "../services/usersDataServiceFireBase";
+import { getUsers as getUsersFromDb, updateUser as updateUserInDb } from "../services/usersDataServiceFireBase";
 import { SnackContext } from "../providers/SnackProvider";
 import type { User } from "../types/User";
 
@@ -16,7 +16,21 @@ function useUsers() {
         }
     }, [raiseSnack]);
 
-    return { users, handleGetUsers };
+    const handleUpdateUser = useCallback(async (userId: string, data: Partial<User>) => {
+        try {
+            await updateUserInDb(userId, data);
+            setUsers(prevUsers => 
+                prevUsers.map(user => 
+                    user.id === userId ? { ...user, ...data } : user
+                )
+            );
+            // Optional: show success snack
+        } catch (error) {
+            raiseSnack("error", "Failed to update user");
+        }
+    }, [raiseSnack]);
+
+    return { users, handleGetUsers, handleUpdateUser };
 }
 
 export default useUsers;

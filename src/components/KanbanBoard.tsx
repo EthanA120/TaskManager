@@ -18,7 +18,7 @@ interface KanbanBoardProps {
   onDeleteColumn: (id: string) => void;
   handleEditTask: (data: Task) => void;
   handleDeleteTask: (id: string) => void;
-  updateLikes: (id: string, action: "inc" | "dec") => void;
+  updateLikes: (id: string) => void;
 }
 
 function KanbanBoard({

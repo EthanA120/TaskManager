@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { getStatusColor, getHebrewStatus } from "../utils/tasksHelpers";
 import ROUTES from "../router/routes";
 import { memo, useContext } from "react";
-import { Edit as EditIcon, Clear as ClearIcon, BookmarkAddOutlined as BookmarkAddOutlinedIcon } from "@mui/icons-material";
+import { Edit as EditIcon, Clear as ClearIcon, BookmarkAddOutlined, BookmarkOutlined } from "@mui/icons-material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 import {
@@ -22,13 +22,15 @@ import {
 
 import type { User } from "../types/User";
 import type { Task } from "../types/Task";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../config/firebase";
 
 interface TaskProps {
   task: Task;
   users: User[];
   handleEditTask: (data: Task) => void;
   handleDeleteTask: (id: string) => void;
-  updateLikes: (id: string, action: "inc" | "dec") => void;
+  updateLikes: (id: string) => void;
 }
 
 function TaskCard({
@@ -40,9 +42,13 @@ function TaskCard({
 }: TaskProps) {
   const navigate = useNavigate();
   const { isDark } = useContext(ProjectThemeContext) as ThemeContextType;
+  const [currentUser] = useAuthState(auth);
 
   const taskOwner = users.find((user) => user.id === task.userId);
   const ownerName = taskOwner?.nickname ?? "לא ידוע";
+
+  const isLiked = !!currentUser && !!task.savedBy?.includes(currentUser.uid);
+  console.log("currentUser.uid", currentUser?.uid);
 
   const assignee = users.find((user) => user.id === task.assigneeId);
   const assigneeName = assignee?.nickname;
@@ -171,8 +177,12 @@ function TaskCard({
         <IconButton onClick={() => handleDeleteTask(task.id)} aria-label="Delete task">
           <ClearIcon sx={{ color: "red" }} />
         </IconButton>
-        <IconButton onClick={() => updateLikes(task.id, "inc")} aria-label="Like">
-          <BookmarkAddOutlinedIcon sx={{ color: isDark ? "#90caf9" : "#1976d2" }} />
+        <IconButton onClick={() => updateLikes(task.id)} aria-label="Like">
+          {isLiked ? 
+            <BookmarkOutlined sx={{ color: isDark ? "#f4d438" : "#ffdd00" }} />
+            : 
+            <BookmarkAddOutlined sx={{ color: "text.secondary"}} />
+          }
         </IconButton>
         <Typography sx={{ ml: 1, fontWeight: "bold" }}>{task.likes}</Typography>
       </CardActions>
